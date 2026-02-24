@@ -8,25 +8,42 @@ const authCont = {}
 /* ***************************
  * Admin Login
  * ************************** */
+
 authCont.login = async (req, res, next) => {
   try {
+    console.log("=== LOGIN ATTEMPT ===")
+    console.log("Body received:", req.body)
+
     const { admin_email, admin_password } = req.body
+
+    // Validate input exists
+    if (!admin_email || !admin_password) {
+      return res.status(400).json({
+        success: false,
+        message: "Email and password are required"
+      })
+    }
 
     // Check if admin exists
     const admin = await adminModel.getAdminByEmail(admin_email)
+    console.log("Admin found:", admin ? "YES" : "NO")
+
     if (!admin) {
-      return res.status(401).json({ 
-        success: false, 
-        message: "Invalid email or password" 
+      return res.status(401).json({
+        success: false,
+        message: "Invalid email or password"
       })
     }
 
     // Check password
+    console.log("Stored hash:", admin.admin_password)
     const passwordMatch = await bcrypt.compare(admin_password, admin.admin_password)
+    console.log("Password match:", passwordMatch)
+
     if (!passwordMatch) {
-      return res.status(401).json({ 
-        success: false, 
-        message: "Invalid email or password" 
+      return res.status(401).json({
+        success: false,
+        message: "Invalid email or password"
       })
     }
 
@@ -49,9 +66,11 @@ authCont.login = async (req, res, next) => {
       maxAge: 24 * 60 * 60 * 1000
     })
 
+    // Return token in response body too
     res.json({
       success: true,
       message: "Login successful",
+      token: token,
       admin: {
         admin_id: admin.admin_id,
         admin_firstname: admin.admin_firstname,
@@ -60,6 +79,7 @@ authCont.login = async (req, res, next) => {
       }
     })
   } catch (error) {
+    console.error("Login error:", error)
     next(error)
   }
 }
