@@ -7,7 +7,16 @@ const utilities = {}
  * Middleware to check JWT token
  * ************************** */
 utilities.checkJWT = (req, res, next) => {
-  const token = req.cookies.jwt
+  let token = req.cookies.jwt
+
+  // Also check Authorization header (Bearer token)
+  if (!token) {
+    const authHeader = req.headers.authorization
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+      token = authHeader.substring(7)
+    }
+  }
+
   if (token) {
     jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
       if (err) {
