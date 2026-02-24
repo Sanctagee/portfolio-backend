@@ -24,7 +24,17 @@ async function addContact(
 
 async function getAllContacts() {
   try {
-    const sql = `SELECT * FROM contact ORDER BY contact_date DESC`
+    // Using correct column names from database: contact_read, contact_date
+    const sql = `SELECT 
+                   contact_id,
+                   contact_name,
+                   contact_email,
+                   contact_subject,
+                   contact_message,
+                   contact_read,
+                   contact_date
+                 FROM contact 
+                 ORDER BY contact_date DESC`
     const result = await pool.query(sql)
     return result.rows
   } catch (error) {
@@ -35,6 +45,7 @@ async function getAllContacts() {
 
 async function markContactRead(contact_id) {
   try {
+    // Correct column name is contact_read (not is_read)
     const sql = `UPDATE contact SET contact_read=true WHERE contact_id=$1 RETURNING *`
     const result = await pool.query(sql, [contact_id])
     return result.rows[0]

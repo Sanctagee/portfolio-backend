@@ -2,6 +2,7 @@ const pool = require("../database/")
 
 async function getAllBlogs() {
   try {
+    // blog_date is the correct column (not created_at)
     const sql = `SELECT blog_id, blog_title, blog_summary, blog_image, blog_slug, blog_published, blog_date 
                  FROM blog ORDER BY blog_date DESC`
     const result = await pool.query(sql)
@@ -57,7 +58,10 @@ async function addBlog(
   try {
     const sql = `INSERT INTO blog (blog_title, blog_content, blog_summary, blog_image, blog_slug, blog_published)
                  VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`
-    const result = await pool.query(sql, [blog_title, blog_content, blog_summary, blog_image, blog_slug, blog_published])
+    const result = await pool.query(sql, [
+      blog_title, blog_content, blog_summary, 
+      blog_image, blog_slug, blog_published
+    ])
     return result.rows[0]
   } catch (error) {
     console.error("addBlog error:", error)
@@ -69,7 +73,10 @@ async function updateBlog(blog_id, blog_title, blog_content, blog_summary, blog_
   try {
     const sql = `UPDATE blog SET blog_title=$1, blog_content=$2, blog_summary=$3, 
                  blog_image=$4, blog_slug=$5, blog_published=$6 WHERE blog_id=$7 RETURNING *`
-    const result = await pool.query(sql, [blog_title, blog_content, blog_summary, blog_image, blog_slug, blog_published, blog_id])
+    const result = await pool.query(sql, [
+      blog_title, blog_content, blog_summary, 
+      blog_image, blog_slug, blog_published, blog_id
+    ])
     return result.rows[0]
   } catch (error) {
     console.error("updateBlog error:", error)
