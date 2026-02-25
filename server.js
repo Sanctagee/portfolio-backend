@@ -3,6 +3,7 @@ const cors = require('cors')
 const cookieParser = require('cookie-parser')
 const session = require('express-session')
 const pool = require('./database/')
+const path = require("path")
 require('dotenv').config()
 
 const app = express()
@@ -47,6 +48,12 @@ app.use(session({
     sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
   }
 }))
+
+/* ***********************
+ * Static Files
+ *************************/
+// Serve uploaded files
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')))
 
 /* ***********************
  * Routes
