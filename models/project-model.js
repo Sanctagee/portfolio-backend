@@ -56,13 +56,24 @@ async function addProject(
   project_featured
 ) {
   try {
+    // Convert to boolean properly
+    const featured = project_featured === true || 
+                     project_featured === 'true' || 
+                     project_featured === 1 || 
+                     project_featured === '1'
+    
     const sql = `INSERT INTO project 
       (project_title, project_description, project_image, 
        project_url, project_github, project_tech, project_featured)
       VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`
     const result = await pool.query(sql, [
-      project_title, project_description, project_image,
-      project_url, project_github, project_tech, project_featured
+      project_title, 
+      project_description, 
+      project_image || null,
+      project_url || null, 
+      project_github || null, 
+      project_tech || null, 
+      featured
     ])
     return result.rows[0]
   } catch (error) {
@@ -85,16 +96,30 @@ async function updateProject(
   project_featured
 ) {
   try {
+    // Convert to boolean properly
+    const featured = project_featured === true || 
+                     project_featured === 'true' || 
+                     project_featured === 1 || 
+                     project_featured === '1'
+    
     const sql = `UPDATE project SET 
-      project_title = $1, project_description = $2,
-      project_image = $3, project_url = $4,
-      project_github = $5, project_tech = $6,
+      project_title = $1, 
+      project_description = $2,
+      project_image = COALESCE($3, project_image), 
+      project_url = $4,
+      project_github = $5, 
+      project_tech = $6,
       project_featured = $7
       WHERE project_id = $8 RETURNING *`
     const result = await pool.query(sql, [
-      project_title, project_description, project_image,
-      project_url, project_github, project_tech,
-      project_featured, project_id
+      project_title, 
+      project_description, 
+      project_image,
+      project_url, 
+      project_github, 
+      project_tech,
+      featured, 
+      project_id
     ])
     return result.rows[0]
   } catch (error) {
