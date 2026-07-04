@@ -19,7 +19,8 @@ const Contact = mongoose.models.Contact || mongoose.model("Contact", contactSche
 
 async function addContact(contact_name, contact_email, contact_subject, contact_message) {
   try {
-    return await Contact.create({ contact_name, contact_email, contact_subject, contact_message })
+    const contact = await Contact.create({ contact_name, contact_email, contact_subject, contact_message })
+    return contact
   } catch (error) {
     console.error("addContact error:", error)
     return null
@@ -28,7 +29,8 @@ async function addContact(contact_name, contact_email, contact_subject, contact_
 
 async function getAllContacts() {
   try {
-    return await Contact.find().sort({ contact_date: -1 })
+    const contacts = await Contact.find().sort({ contact_date: -1 })
+    return contacts
   } catch (error) {
     console.error("getAllContacts error:", error)
     return []
@@ -37,7 +39,8 @@ async function getAllContacts() {
 
 async function markContactRead(contact_id) {
   try {
-    return await Contact.findByIdAndUpdate(contact_id, { contact_read: true }, { new: true })
+    const contact = await Contact.findByIdAndUpdate(contact_id, { contact_read: true }, { new: true })
+    return contact
   } catch (error) {
     console.error("markContactRead error:", error)
     return null

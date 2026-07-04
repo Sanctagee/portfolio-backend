@@ -21,7 +21,8 @@ const Project = mongoose.models.Project || mongoose.model("Project", projectSche
 
 async function getAllProjects() {
   try {
-    return await Project.find().sort({ project_date: -1 })
+    const projects = await Project.find().sort({ project_date: -1 })
+    return projects
   } catch (error) {
     console.error("getAllProjects error:", error)
     return []
@@ -30,7 +31,8 @@ async function getAllProjects() {
 
 async function getFeaturedProjects() {
   try {
-    return await Project.find({ project_featured: true }).sort({ project_date: -1 }).limit(6)
+    const projects = await Project.find({ project_featured: true }).sort({ project_date: -1 }).limit(6)
+    return projects
   } catch (error) {
     console.error("getFeaturedProjects error:", error)
     return []
@@ -39,7 +41,8 @@ async function getFeaturedProjects() {
 
 async function getProjectById(project_id) {
   try {
-    return await Project.findById(project_id)
+    const project = await Project.findById(project_id)
+    return project
   } catch (error) {
     console.error("getProjectById error:", error)
     return null
@@ -53,7 +56,7 @@ async function addProject(
   try {
     const featured = project_featured === true || project_featured === "true" ||
                      project_featured === 1 || project_featured === "1"
-    return await Project.create({
+    const project = await Project.create({
       project_title,
       project_description,
       project_image: project_image || null,
@@ -62,6 +65,7 @@ async function addProject(
       project_tech: project_tech || null,
       project_featured: featured,
     })
+    return project
   } catch (error) {
     console.error("addProject error:", error)
     return null
@@ -86,7 +90,8 @@ async function updateProject(
     // Mirrors the old COALESCE($3, project_image) — only overwrite the image if a new one was given.
     if (project_image) update.project_image = project_image
 
-    return await Project.findByIdAndUpdate(project_id, update, { new: true })
+    const project = await Project.findByIdAndUpdate(project_id, update, { new: true })
+    return project
   } catch (error) {
     console.error("updateProject error:", error)
     return null

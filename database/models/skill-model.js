@@ -1,5 +1,7 @@
 const mongoose = require("../database/")
 
+// Field names match the old Postgres columns exactly, so controllers and the
+// frontend keep working unchanged. skill_id is a virtual mirroring Mongo's _id.
 const skillSchema = new mongoose.Schema({
   skill_name: { type: String, required: true },
   skill_category: { type: String, required: true },
@@ -18,7 +20,8 @@ const Skill = mongoose.models.Skill || mongoose.model("Skill", skillSchema, "ski
 
 async function getAllSkills() {
   try {
-    return await Skill.find().sort({ skill_order: 1 })
+    const skills = await Skill.find().sort({ skill_order: 1 })
+    return skills
   } catch (error) {
     console.error("getAllSkills error:", error)
     return []
@@ -27,7 +30,8 @@ async function getAllSkills() {
 
 async function addSkill(skill_name, skill_category, skill_level, skill_icon, skill_order) {
   try {
-    return await Skill.create({ skill_name, skill_category, skill_level, skill_icon, skill_order })
+    const skill = await Skill.create({ skill_name, skill_category, skill_level, skill_icon, skill_order })
+    return skill
   } catch (error) {
     console.error("addSkill error:", error)
     return null
@@ -36,11 +40,12 @@ async function addSkill(skill_name, skill_category, skill_level, skill_icon, ski
 
 async function updateSkill(skill_id, skill_name, skill_category, skill_level, skill_icon, skill_order) {
   try {
-    return await Skill.findByIdAndUpdate(
+    const skill = await Skill.findByIdAndUpdate(
       skill_id,
       { skill_name, skill_category, skill_level, skill_icon, skill_order },
       { new: true }
     )
+    return skill
   } catch (error) {
     console.error("updateSkill error:", error)
     return null

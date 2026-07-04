@@ -20,7 +20,8 @@ const Blog = mongoose.models.Blog || mongoose.model("Blog", blogSchema, "blog")
 
 async function getAllBlogs() {
   try {
-    return await Blog.find().sort({ blog_date: -1 })
+    const blogs = await Blog.find().sort({ blog_date: -1 })
+    return blogs
   } catch (error) {
     console.error("getAllBlogs error:", error)
     return []
@@ -29,7 +30,8 @@ async function getAllBlogs() {
 
 async function getPublishedBlogs() {
   try {
-    return await Blog.find({ blog_published: true }).sort({ blog_date: -1 })
+    const blogs = await Blog.find({ blog_published: true }).sort({ blog_date: -1 })
+    return blogs
   } catch (error) {
     console.error("getPublishedBlogs error:", error)
     return []
@@ -38,7 +40,8 @@ async function getPublishedBlogs() {
 
 async function getBlogBySlug(blog_slug) {
   try {
-    return await Blog.findOne({ blog_slug })
+    const blog = await Blog.findOne({ blog_slug })
+    return blog
   } catch (error) {
     console.error("getBlogBySlug error:", error)
     return null
@@ -47,7 +50,8 @@ async function getBlogBySlug(blog_slug) {
 
 async function getBlogById(blog_id) {
   try {
-    return await Blog.findById(blog_id)
+    const blog = await Blog.findById(blog_id)
+    return blog
   } catch (error) {
     console.error("getBlogById error:", error)
     return null
@@ -56,7 +60,8 @@ async function getBlogById(blog_id) {
 
 async function addBlog(blog_title, blog_content, blog_summary, blog_image, blog_slug, blog_published) {
   try {
-    return await Blog.create({ blog_title, blog_content, blog_summary, blog_image, blog_slug, blog_published })
+    const blog = await Blog.create({ blog_title, blog_content, blog_summary, blog_image, blog_slug, blog_published })
+    return blog
   } catch (error) {
     console.error("addBlog error:", error)
     return null
@@ -65,11 +70,12 @@ async function addBlog(blog_title, blog_content, blog_summary, blog_image, blog_
 
 async function updateBlog(blog_id, blog_title, blog_content, blog_summary, blog_image, blog_slug, blog_published) {
   try {
-    return await Blog.findByIdAndUpdate(
+    const blog = await Blog.findByIdAndUpdate(
       blog_id,
       { blog_title, blog_content, blog_summary, blog_image, blog_slug, blog_published },
       { new: true }
     )
+    return blog
   } catch (error) {
     console.error("updateBlog error:", error)
     return null
