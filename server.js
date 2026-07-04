@@ -1,10 +1,9 @@
 const express = require('express')
 const cors = require('cors')
 const cookieParser = require('cookie-parser')
-const session = require('express-session')
-const pool = require('./database/')
 const path = require("path")
 require('dotenv').config()
+require('./database/') // establishes the MongoDB connection on startup
 
 const app = express()
 
@@ -14,11 +13,9 @@ const app = express()
 // CORS - allows React frontend to talk to backend
 app.use(cors({
   origin: function(origin, callback) {
-    const allowed = [
-      'http://localhost:5173',
-      process.env.FRONTEND_URL
-    ].filter(Boolean)
-    if (!origin || allowed.includes(origin)) {
+    const isLocalhost = !origin || /^http:\/\/localhost:\d+$/.test(origin)
+    const allowed = isLocalhost || origin === process.env.FRONTEND_URL
+    if (allowed) {
       callback(null, true)
     } else {
       callback(new Error('Not allowed by CORS'))
@@ -30,24 +27,6 @@ app.use(cors({
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 app.use(cookieParser())
-
-// Session
-app.use(session({
-  store: new (require('connect-pg-simple')(session))({
-    createTableIfMissing: true,
-    pool,
-  }),
-  secret: process.env.SESSION_SECRET,
-  resave: false,
-  saveUninitialized: false,
-  name: 'portfolioSession',
-  cookie: {
-    secure: process.env.NODE_ENV === 'production',
-    httpOnly: true,
-    maxAge: 24 * 60 * 60 * 1000,
-    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
-  }
-}))
 
 /* ***********************
  * Static Files
