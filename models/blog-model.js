@@ -8,6 +8,7 @@ const blogSchema = new mongoose.Schema({
   blog_slug: { type: String, required: true, unique: true },
   blog_published: { type: Boolean, default: false },
   blog_date: { type: Date, default: Date.now },
+  blog_updated_at: { type: Date, default: Date.now },
 })
 
 blogSchema.virtual("blog_id").get(function () {
@@ -56,6 +57,9 @@ async function getBlogById(blog_id) {
 
 async function addBlog(blog_title, blog_content, blog_summary, blog_image, blog_slug, blog_published) {
   try {
+    // blog_date and blog_updated_at both default to now on creation —
+    // so a brand-new post correctly shows no "Updated" tag until it's
+    // actually edited later.
     return await Blog.create({ blog_title, blog_content, blog_summary, blog_image, blog_slug, blog_published })
   } catch (error) {
     console.error("addBlog error:", error)
@@ -67,7 +71,15 @@ async function updateBlog(blog_id, blog_title, blog_content, blog_summary, blog_
   try {
     return await Blog.findByIdAndUpdate(
       blog_id,
-      { blog_title, blog_content, blog_summary, blog_image, blog_slug, blog_published },
+      {
+        blog_title,
+        blog_content,
+        blog_summary,
+        blog_image,
+        blog_slug,
+        blog_published,
+        blog_updated_at: new Date(), // stamped fresh on every update
+      },
       { new: true }
     )
   } catch (error) {
