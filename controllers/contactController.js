@@ -1,4 +1,5 @@
 const contactModel = require("../models/contact-model")
+const { sendReplyEmail } = require("../utilities/mailer")
 
 const contactCont = {}
 
@@ -38,6 +39,38 @@ contactCont.markRead = async (req, res, next) => {
     }
   } catch (error) {
     next(error)
+  }
+}
+
+// Sends a real email reply through Gmail (via Nodemailer) and records
+// the reply on the contact document for reference in the admin panel
+contactCont.replyToMessage = async (req, res, next) => {
+  try {
+    const { id } = req.params
+    const { reply_message } = req.body
+
+    if (!reply_message || !reply_message.trim()) {
+      return res.status(400).json({ success: false, message: "Reply message cannot be empty" })
+    }
+
+    const contact = await contactModel.getContactById(id)
+    if (!contact) {
+      return res.status(404).json({ success: false, message: "Message not found" })
+    }
+
+    await sendReplyEmail(
+      contact.contact_email,
+      contact.contact_name,
+      contact.contact_subject,
+      reply_message
+    )
+
+    const updated = await contactModel.markContactReplied(id, reply_message)
+
+    res.json({ success: true, message: "Reply sent!", data: updated })
+  } catch (error) {
+    console.error("replyToMessage error:", error)
+    res.status(500).json({ success: false, message: "Failed to send reply. Please try again." })
   }
 }
 
