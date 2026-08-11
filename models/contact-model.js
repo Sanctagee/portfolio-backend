@@ -7,6 +7,9 @@ const contactSchema = new mongoose.Schema({
   contact_message: { type: String, required: true },
   contact_read: { type: Boolean, default: false },
   contact_date: { type: Date, default: Date.now },
+  contact_replied: { type: Boolean, default: false },
+  contact_reply_message: { type: String, default: null },
+  contact_replied_at: { type: Date, default: null },
 })
 
 contactSchema.virtual("contact_id").get(function () {
@@ -35,11 +38,37 @@ async function getAllContacts() {
   }
 }
 
+async function getContactById(contact_id) {
+  try {
+    return await Contact.findById(contact_id)
+  } catch (error) {
+    console.error("getContactById error:", error)
+    return null
+  }
+}
+
 async function markContactRead(contact_id) {
   try {
     return await Contact.findByIdAndUpdate(contact_id, { contact_read: true }, { new: true })
   } catch (error) {
     console.error("markContactRead error:", error)
+    return null
+  }
+}
+
+async function markContactReplied(contact_id, reply_message) {
+  try {
+    return await Contact.findByIdAndUpdate(
+      contact_id,
+      {
+        contact_replied: true,
+        contact_reply_message: reply_message,
+        contact_replied_at: new Date(),
+      },
+      { new: true }
+    )
+  } catch (error) {
+    console.error("markContactReplied error:", error)
     return null
   }
 }
@@ -54,4 +83,11 @@ async function deleteContact(contact_id) {
   }
 }
 
-module.exports = { addContact, getAllContacts, markContactRead, deleteContact }
+module.exports = {
+  addContact,
+  getAllContacts,
+  getContactById,
+  markContactRead,
+  markContactReplied,
+  deleteContact,
+}
