@@ -9,6 +9,7 @@ router.post("/", contactController.sendMessage)
 // Admin only
 router.get("/", checkJWT, contactController.getAllMessages)
 router.put("/:id/read", checkJWT, contactController.markRead)
+router.post("/:id/reply", checkJWT, contactController.replyToMessage)
 router.delete("/:id", checkJWT, contactController.deleteMessage)
 
 module.exports = router
