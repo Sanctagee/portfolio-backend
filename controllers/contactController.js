@@ -1,5 +1,5 @@
 const contactModel = require("../models/contact-model")
-const { sendReplyEmail } = require("../utilities/mailer")
+const { sendReplyEmail } = require("../utilities/resend")
 
 const contactCont = {}
 
